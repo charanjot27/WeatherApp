@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Weather App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 350px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            color: white;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .weather-box {
+            animation: slideIn 2s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        .city-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            width: 80%;
+            margin-top: 15px;
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            background-color: #00bcd4;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .weather-info {
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .weather-info.visible {
+            opacity: 1;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("search-btn").addEventListener("click", async () => {
+                const city = document.getElementById("city").value;
+                if (city) {
+                    const apiKey = "https://api.openweathermap.org/data/2.5/";  // replace with your OpenWeatherMap API key
+                    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+                    
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error("City not found");
+                        }
+                        const weatherData = await response.json();
+                        
+                        document.getElementById("location").innerText = `${weatherData.name}, ${weatherData.sys.country}`;
+                        document.getElementById("temperature").innerText = `Temperature: ${Math.round(weatherData.main.temp)} °C`;
+                        document.getElementById("description").innerText = weatherData.weather[0].description;
+                        
+                        const weatherInfo = document.querySelector('.weather-info');
+                        weatherInfo.classList.add("visible");
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="weather-box">
+            <h1 class="app-title">Weather App</h1>
+            <input type="text" id="city" placeholder="Enter city" class="city-input">
+            <button id="search-btn" class="search-btn">Search</button>
+            <div class="weather-info">
+                <div class="location" id="location"></div>
+                <div class="temperature" id="temperature"></div>
+                <div class="description" id="description"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
